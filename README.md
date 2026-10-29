@@ -2,7 +2,7 @@
 
 Experimental **client-side Fabric mod for Minecraft 26.2**. It tries to traverse procedurally generated 1×1 full-block parkour platforms by reading nearby client-visible blocks and using ordinary movement controls.
 
-## What version 0.1.1 actually does
+## What version 0.1.2 actually does
 
 - **P** toggles the controller (Settings → Controls → AIbotParkour47).
 - Finds full-sized platforms within a short distance, accounting for platforms higher/lower than the current one.
@@ -19,7 +19,7 @@ Experimental **client-side Fabric mod for Minecraft 26.2**. It tries to traverse
 1. Use Minecraft Java **26.2** with Fabric Loader **0.19.3+** and Java **25**.
 2. Install **Fabric API** for Minecraft 26.2 (for example 0.156.0+26.2).
 3. Go to **Actions → Build AIbotParkour47** and open a *successful* workflow run.
-4. Download artifact `AIbotParkour47-0.1.1-Minecraft-26.2`, unzip it and move the **non-sources** `.jar` into `.minecraft/mods`.
+4. Download artifact `AIbotParkour47-0.1.2-Minecraft-26.2`, unzip it and move the **non-sources** `.jar` into `.minecraft/mods`.
 5. Load a test parkour and press **P** near the stone pressure plate or while standing on an isolated parkour platform. Press **P** again to stop instantly.
 
 ## Testing / known limits
@@ -33,3 +33,13 @@ Experimental **client-side Fabric mod for Minecraft 26.2**. It tries to traverse
 ## Developers
 
 Built with Gradle 9.5.1, Java 25 and Fabric Loom 1.17. Run `gradle build` to compile from source. The CI workflow uploads the JAR as an artifact.
+
+## Version 0.1.2: new spawn and fall logic
+
+- Course detection requires **a floating 1×1 platform**, with air beneath and no solid neighboring blocks. This prevents the spawn floor from being counted as parkour.
+- The bot stays still on normal terrain except when it identifies a nearby stone pressure plate. If the plate is far away, walk near it manually before pressing P.
+- After landing on spawn terrain or missing a jump, movement is released and the course attempt is reset.
+- Fall detection starts earlier once the feet drop below the landing surface.
+- Jump takeoff for long gaps is slightly later. This still needs real-server testing: a compiled mod is not a verified 200-block clear.
+
+If the server uses a non-stone starting plate or solid support blocks under the floating parkour, the new scanner must be adjusted.
