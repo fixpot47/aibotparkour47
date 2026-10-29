@@ -1,0 +1,31 @@
+name: Build AIbotParkour47
+on:
+  push:
+    branches: [main, feature/parkour-bot-mvp]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.5.1'
+      - name: Compile Minecraft mod
+        run: gradle --no-daemon build
+      - name: Save installable JAR
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: AIbotParkour47-0.1.0-Minecraft-26.2
+          path: |
+            build/libs/aibotparkour47-*.jar
+            !build/libs/*-sources.jar
+          if-no-files-found: error
