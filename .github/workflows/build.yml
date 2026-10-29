@@ -24,7 +24,7 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: AIbotParkour47-0.1.1-Minecraft-26.2
+          name: AIbotParkour47-0.1.2-Minecraft-26.2
           path: |
             build/libs/aibotparkour47-*.jar
             !build/libs/*-sources.jar
