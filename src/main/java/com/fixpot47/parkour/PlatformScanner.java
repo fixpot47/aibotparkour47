@@ -26,9 +26,26 @@ final class PlatformScanner {
                 && level.getBlockState(block.above(2)).isAir();
     }
 
+    /**
+     * In this minigame the real 1x1 course blocks float over empty space,
+     * unlike the normal solid spawn floor. Never treat spawn terrain as
+     * a jump target or count it as a completed platform.
+     */
+    static boolean isCoursePlatform(ClientLevel level, BlockPos block) {
+        if (!isPlatform(level, block)) return false;
+        if (!level.getBlockState(block.below()).isAir()) return false;
+        for (int[] step : new int[][]{{1, 0}, {-1, 0}, {0, 1}, {0, -1}}) {
+            BlockPos adjacent = block.offset(step[0], 0, step[1]);
+            if (!level.getBlockState(adjacent).getCollisionShape(level, adjacent).isEmpty()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     static BlockPos standingBlock(ClientLevel level, double x, double y, double z) {
         BlockPos block = BlockPos.containing(x, y - 0.12, z);
-        return isPlatform(level, block) ? block : null;
+        return isCoursePlatform(level, block) ? block : null;
     }
 
     static BlockPos nearestPlate(ClientLevel level, BlockPos origin) {
@@ -58,7 +75,7 @@ final class PlatformScanner {
             for (int x = -5; x <= 5; x++)
                 for (int z = -5; z <= 5; z++) {
                     BlockPos pos = current.offset(x, y, z);
-                    if (excluded.contains(pos) || !isPlatform(level, pos)) continue;
+                    if (excluded.contains(pos) || !isCoursePlatform(level, pos)) continue;
                     double distance = Math.hypot(x, z);
                     if (distance < 1.10 || distance > maxRange(y)) continue;
                     targets.add(pos);
