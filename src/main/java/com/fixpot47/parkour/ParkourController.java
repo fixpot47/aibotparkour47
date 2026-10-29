@@ -40,7 +40,7 @@ final class ParkourController {
 
     void tick(Minecraft mc) {
         if (!enabled || mc.player == null || mc.level == null) return;
-        if (mc.screen != null) { release(mc); return; }
+        if (mc.gui.screen() != null) { release(mc); return; }
 
         LocalPlayer player = mc.player;
         ClientLevel level = mc.level;
@@ -64,7 +64,7 @@ final class ParkourController {
             BlockPos plate = PlatformScanner.nearestPlate(level, player.blockPosition());
             if (plate != null) {
                 Vec3 plateCentre = new Vec3(plate.getX() + .5, plate.getY(), plate.getZ() + .5);
-                steer(mc, player, plateCentre, true, false, false);
+                steer(mc, player, plateCentre, Math.hypot(plateCentre.x - player.getX(), plateCentre.z - player.getZ()) > 0.15, false, false);
                 if (ticks % 30 == 0) notify(mc, "§eИду к нажимной плите...");
                 return;
             }
@@ -125,7 +125,8 @@ final class ParkourController {
             Vec3 takeoff = new Vec3(centreX + nx * edgeOffset,
                     player.getY(), centreZ + nz * edgeOffset);
             double approach = Math.hypot(player.getX() - takeoff.x, player.getZ() - takeoff.z);
-            boolean launch = approach < 0.16;
+            double progress = (player.getX() - centreX) * nx + (player.getZ() - centreZ) * nz;
+            boolean launch = progress >= edgeOffset - 0.11;
             // Always look towards the *landing* target, including during run-up.
             steer(mc, player, goal, true, launch, true);
         }
@@ -161,6 +162,6 @@ final class ParkourController {
     }
 
     private void notify(Minecraft mc, String message) {
-        if (mc.player != null) mc.player.displayClientMessage(Component.literal(message), true);
+        if (mc.player != null) mc.gui.hud.setOverlayMessage(Component.literal(message), false);
     }
 }
