@@ -160,13 +160,21 @@ final class ParkourController {
         // impossible. Also catches the case where a course block disappears.
         double lowestLanding = target != null
                 ? target.getY() + 1.0 : current.getY() + 1.0;
-        if (!player.onGround() && player.getY() < lowestLanding - 0.9) {
+        if (!player.onGround() && player.getDeltaMovement().y < -0.03
+                && player.getY() < lowestLanding - 0.15) {
             failed(mc, "пролетел ниже платформы");
             return;
         }
-        if (player.onGround() && under == null
-                && player.getY() < current.getY() + 0.5) {
-            failed(mc, "приземлился вне паркура");
+        if (player.onGround() && under == null) {
+            // Landing on a normal spawn-floor block is NOT a successful jump.
+            // Some servers respawn nearby without a large teleport.
+            if (plate != null) {
+                release(mc);
+                clearAttempt();
+                notify(mc, "§eНа спавне: начинаю заново через плиту");
+            } else {
+                failed(mc, "приземлился вне паркура");
+            }
             return;
         }
 
@@ -188,7 +196,7 @@ final class ParkourController {
         }
 
         // Keep the current target while jumping instead of switching mid-flight.
-        if (target != null && !PlatformScanner.isPlatform(level, target)) {
+        if (target != null && !PlatformScanner.isCoursePlatform(level, target)) {
             target = null;
             if (!player.onGround()) {
                 failed(mc, "целевая платформа исчезла");
@@ -229,10 +237,10 @@ final class ParkourController {
             double total = Math.max(0.001, Math.hypot(fromX, fromZ));
             double nx = fromX / total;
             double nz = fromZ / total;
-            double edgeOffset = total < 2.6 ? 0.05 : 0.38;
+            double edgeOffset = total < 2.6 ? 0.05 : (total > 3.4 ? 0.53 : 0.38);
             double progress = (player.getX() - centreX) * nx +
                     (player.getZ() - centreZ) * nz;
-            boolean launch = progress >= edgeOffset - 0.11;
+            boolean launch = progress >= edgeOffset - 0.08;
             steer(mc, player, goal, true, launch, true);
         }
 
