@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "id": "aibotparkour47",
+  "version": "${version}",
+  "name": "AIbotParkour47",
+  "description": "Experimental client-side automatic jumping for dynamic single-block parkour courses.",
+  "authors": ["fixpot47"],
+  "environment": "client",
+  "entrypoints": {
+    "client": ["com.fixpot47.parkour.ParkourBotClient"]
+  },
+  "depends": {
+    "fabricloader": ">=0.19.3",
+    "fabric-api": "*",
+    "minecraft": "26.2",
+    "java": ">=25"
+  }
+}
